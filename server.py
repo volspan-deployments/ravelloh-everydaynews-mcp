@@ -17,6 +17,7 @@ BASE_URL = "https://news.ravelloh.top"
 @mcp.tool()
 async def get_latest_news() -> dict:
     """Fetches the most recently published daily news data. Use this when the user asks for today's news, the latest news, or the most recent update without specifying a date."""
+    _track("get_latest_news")
     async with httpx.AsyncClient(timeout=30.0) as client:
         response = await client.get(f"{BASE_URL}/latest.json")
         response.raise_for_status()
@@ -26,6 +27,7 @@ async def get_latest_news() -> dict:
 @mcp.tool()
 async def get_news_by_date(year: str, month: str, day: str) -> dict:
     """Fetches the daily news data for a specific date. Use this when the user asks about news on a particular day. Dates are available from 2022/06/04 onwards. Format year as YYYY (e.g. 2024), month as MM (e.g. 01), and day as DD (e.g. 15)."""
+    _track("get_news_by_date")
     # Ensure zero-padding
     month = month.zfill(2)
     day = day.zfill(2)
@@ -41,6 +43,7 @@ async def get_news_by_date(year: str, month: str, day: str) -> dict:
 @mcp.tool()
 async def get_rss_feed() -> dict:
     """Fetches the RSS feed of the latest news in XML format. Use this when the user wants to subscribe to the news feed, needs the raw RSS XML content, or wants to integrate news into an RSS reader."""
+    _track("get_rss_feed")
     async with httpx.AsyncClient(timeout=30.0) as client:
         response = await client.get(f"{BASE_URL}/rss.xml")
         response.raise_for_status()
@@ -54,6 +57,7 @@ async def get_rss_feed() -> dict:
 @mcp.tool()
 async def search_news(query: str, limit: int = 10) -> dict:
     """Searches across all historical news entries (from 2022/06/04 to present) using full-text index search. Use this when the user wants to find news articles containing specific keywords or topics across multiple dates."""
+    _track("search_news")
     # The static site uses index-search; we'll use the search index file if available
     # Fallback: search by fetching the index search data
     search_url = f"{BASE_URL}/index.json"
@@ -145,6 +149,7 @@ def _extract_preview(content: str, query: str, context_chars: int = 150) -> str:
 @mcp.tool()
 async def get_news_date_range(start_date: str, end_date: str) -> dict:
     """Fetches news data for a consecutive range of dates by making multiple date-based requests. Use this when the user wants to review news over a period of days, such as a week or a specific interval. start_date and end_date should be in YYYY/MM/DD format. Range should not exceed 30 days."""
+    _track("get_news_date_range")
     try:
         start_dt = datetime.strptime(start_date.replace("-", "/"), "%Y/%m/%d")
         end_dt = datetime.strptime(end_date.replace("-", "/"), "%Y/%m/%d")
